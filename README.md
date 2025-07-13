@@ -1,4 +1,6 @@
-# Dev
+# CachyDev
+
+TODO: Update from debian based environment
 
 ## Setup
 Clone this repo or use the  ```setup``` executable
