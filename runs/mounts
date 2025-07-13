@@ -1,5 +1,45 @@
 #!/bin/bash
 
-sudo apt -y install ca-certificates davfs2 cifs-utils
+# Setup TrueNAS and Nextcloud mounts
+#
+# /media/truenas/
+# /media/nextcloud/
 
-sudo usermod -aG davfs2 simon 
+sudo pacman -S nextcloud-client --noconfirm
+
+sudo mkdir /media/nextcloud
+sudo mkdir /media/truenas
+
+sudo chown simon:simon /media/nextcloud
+sudo chown simon:simon /media/truenas
+
+# check if .smbcredentials already exists
+if [ -f /home/simon/.smbcredentials ]; then
+    echo ".smbcredentials already exists, skipping."
+else
+    # TrueNAS login
+    read truenas_username -p "TrueNAS username: "
+    read -s truenas_password -p "TrueNAS password: "
+
+    touch /home/simon/.smbcredentials
+    echo "username=$truenas_username" >> /home/simon/.smbcredentials
+    echo "password=$truenas_password" >> /home/simon/.smbcredentials
+    sudo chmod 600 /home/simon/.smbcredentials
+    sudo chown simon:simon /home/simon/.smbcredentials
+fi
+
+# check if the mount is already in fstab
+if grep -q "//truenas.alle-schindlers.de/Daten" /etc/fstab; then
+    echo "TrueNAS mount already exists in /etc/fstab, skipping."
+else
+    echo "Adding TrueNAS mount to /etc/fstab."
+    sudo echo "//truenas.alle-schindlers.de/Daten /media/truenas cifs credentials=/home/simon/.smbcredentials,uid=simon,gid=simon,auto,rw 0 0" >> /etc/fstab
+fi
+
+mount /media/truenas
+
+echo "Login to Nextcloud in your browser."
+nextcloud
+
+# Wait for user to finish logging in
+read -p "Press enter when you have logged in to Nextcloud."

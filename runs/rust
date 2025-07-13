@@ -1,5 +1,5 @@
 #!/bin/bash
 
-sudo apt -y install curl
+sudo pacman -Syu --noconfirm --needed curl
 
 curl https://sh.rustup.rs -sSf | sh -s -- -y

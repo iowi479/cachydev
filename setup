@@ -1,14 +1,38 @@
 #!/bin/bash
 
-sudo apt -y update
-sudo apt -y install git
+# This script automates the setup and update of the "cachydev" repository.
+# It ensures the system packages are up-to-date, installs git if missing,
+# then clones or updates the repository in $HOME/personal/cachydev,
+# and finally runs the included ./run script inside the repo.
 
+set -e  # Exit immediately if any command fails
+
+# Update the system and install git if it is not already installed,
+# skipping reinstall if git is present
+sudo pacman -Syu --needed --noconfirm git
+
+# Create the directory $HOME/personal if it doesn't exist
 if [ ! -d $HOME/personal ]; then
     mkdir $HOME/personal
 fi
 
-git clone https://github.com/iowi479/dev $HOME/personal/dev
+TARGET_DIR="$HOME/personal/cachydev"
 
-pushd $HOME/personal/dev
+# Check if the repository directory exists
+if [ ! -d $TARGET_DIR/.git ]; then
+    # If not, create the directory and clone the repository
+    mkdir $TARGET_DIR
+    git clone https://github.com/iowi479/cachydev $TARGET_DIR
+else
+    # If it exists, pull the latest changes safely (fast-forward only)
+    git -C $TARGET_DIR pull --ff-only
+fi
+
+# Navigate into the repository and execute the included run script
+pushd $TARGET_DIR
 ./run
 popd
+
+
+# TODO: devenv?
+

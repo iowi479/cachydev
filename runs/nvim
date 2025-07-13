@@ -1,6 +1,8 @@
 #!/bin/bash 
 
-curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
-sudo rm -rf /opt/nvim
-sudo tar -C /opt -xzf nvim-linux64.tar.gz
-rm nvim-linux64.tar.gz
+# To make the system clipboard work with Neovim,
+# you may need to install xclip (X11) or wl-clipboard (Wayland).
+
+sudo pacman -Syu --noconfirm --needed nvim wl-clipboard xclip
+
+

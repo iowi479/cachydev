@@ -1,11 +1,24 @@
 #!/bin/bash
 
-script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+# This script searches for executable scripts in the "runs" subdirectory relative to the script's location,
+# filters them based on an optional grep pattern provided as a command-line argument,
+# and executes the filtered scripts.
+# Supports a "dry run" mode that only logs which scripts would be run without actually executing them.
 
+# Usage:
+# ./script.sh [--dry] [grep_pattern]
+#   --dry         Runs in dry-run mode, printing which scripts would run without executing.
+#   grep_pattern  Optional pattern to filter which scripts to execute based on their paths.
+
+set -e # Exit immediately if any command fails
+
+# Resolve the directory where this script resides, even when called from elsewhere
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 grep=""
 dry_run="0"
 
+# Parse command line arguments
 while [[ $# -gt 0 ]]; do
     echo "ARG: \"$1\""
     if [[ "$1" == "--dry" ]]; then
@@ -16,6 +29,7 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
+# Logging function
 log() {
     if [[ $dry_run == "1" ]]; then
         echo "[DRY_RUN]: $1"
@@ -26,9 +40,12 @@ log() {
 
 log "RUN: env: $env -- grep: $grep"
 
-runs_dir=`find $script_dir/runs -mindepth 1 -maxdepth 1 -executable`
+# Find all executable files in the 'runs' directory inside the script's directory
+runs_dir=$(find "$script_dir/runs" -mindepth 1 -maxdepth 1 -executable)
 
+# Loop through each executable script found
 for s in $runs_dir; do
+    # If a grep pattern is provided and the script's path does NOT match the pattern, skip it
     if echo "$s" | grep -vq "$grep"; then
         log "grep \"$grep\" filtered out $s"
         continue
@@ -36,54 +53,9 @@ for s in $runs_dir; do
 
     log "running script: $s"
 
+    # Execute the script unless in dry-run mode
     if [[ $dry_run == "0" ]]; then
         $s
     fi
 done
 
-#remove_files() {
-#    pushd $1
-#    (
-#        configs=`find . -mindepth 1 -maxdepth 1 -type d`
-#        if [[ $dry_run == "1" ]]; then
-#            echo "[DRY_RUN]: removing: $configs"
-#        else
-#            echo "removing: $configs"
-#        fi
-#
-#        for c in $configs; do
-#            directory=${2%/}/${c}
-#            if [[ $dry_run == "1" ]]; then
-#                echo "[DRY_RUN]:    removing: $directory"
-#            else
-#                echo "    removing: $directory"
-#                rm -rf $directory
-#            fi
-#        done
-#
-#        if [[ $dry_run == "1" ]]; then
-#            echo "copying env: $2"
-#        else
-#            echo "copying env: $2"
-#            cp -r ./* $2
-#        fi
-#    )
-#    popd
-#}
-
-#run_env() {
-#    pushd $script_dir
-#    echo "removing ~config"
-#    remove_files env/.config $XDG_CONFIG_HOME
-#
-#    echo "removing ~local"
-#    remove_files env/.local $HOME/.local
-#
-#    echo "copying zsh"
-#    if [[ $dry_run == "0" ]]; then
-#        cp $script_dir/env/.zshrc ~/.zshrc
-#        cp $script_dir/env/.zsh_profile ~/.zsh_profile
-#    fi
-#
-#    popd
-#}
