@@ -1,9 +1,9 @@
-#!/bin/bash
 
-if [[ "$(pwd)" == $HOME/personal ]]; then
+
+if test (pwd) == $HOME/personal
     clear
     return
-fi
+end
 
 tmux new-window -dn run
 clear

@@ -1,7 +1,0 @@
-#!/bin/bash
-
-# TODO: Update
-
-sudo pacman -Syu --noconfirm --needed fisher
-
-# TODO: install fzf PatrickF1/fzf.fish setup keybinds setup theme setup status line

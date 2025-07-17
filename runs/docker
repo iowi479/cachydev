@@ -1,9 +1,11 @@
 #!/bin/bash
 
-sudo pacman -Syu --noconfirm --needed docker
-
-# TODO: needed?
-sudo groupadd docker
-sudo usermod -aG docker $USER
-newgrp docker
-
+# TODO: Update
+#
+# sudo pacman -Syu --noconfirm --needed docker
+#
+# # TODO: needed?
+# sudo groupadd docker
+# sudo usermod -aG docker $USER
+# newgrp docker
+#

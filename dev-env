@@ -55,9 +55,12 @@ copy() {
     fi
 }
 
-update_files $DEV_ENV_HOME/env/.config $XDG_CONFIG_HOME
+update_files $DEV_ENV_HOME/env/.config $HOME/.config
 
-copy $DEV_ENV_HOME/env/.zshrc $HOME/.zshrc
-copy $DEV_ENV_HOME/env/.zshenv $HOME/.zshenv
+if [ ! -d "$HOME/.local/bin" ]; then
+    mkdir -p "$HOME/.local/bin"
+    echo "Created $HOME/.local/bin"
+fi
+
 copy $DEV_ENV_HOME/dev-env $HOME/.local/bin/dev-env
 copy $DEV_ENV_HOME/tmux-sessionizer/tmux-sessionizer $HOME/.local/bin/tmux-sessionizer

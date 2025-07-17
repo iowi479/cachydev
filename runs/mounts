@@ -5,10 +5,9 @@
 # /media/truenas/
 # /media/nextcloud/
 
-sudo pacman -S nextcloud-client --noconfirm
 
-sudo mkdir /media/nextcloud
-sudo mkdir /media/truenas
+sudo mkdir -p /media/nextcloud
+sudo mkdir -p /media/truenas
 
 sudo chown simon:simon /media/nextcloud
 sudo chown simon:simon /media/truenas
@@ -18,8 +17,10 @@ if [ -f /home/simon/.smbcredentials ]; then
     echo ".smbcredentials already exists, skipping."
 else
     # TrueNAS login
-    read truenas_username -p "TrueNAS username: "
-    read -s truenas_password -p "TrueNAS password: "
+    echo "TrueNAS username: "
+    read truenas_username
+    echo "TrueNAS password: "
+    read -s truenas_password
 
     touch /home/simon/.smbcredentials
     echo "username=$truenas_username" >> /home/simon/.smbcredentials
@@ -36,10 +37,27 @@ else
     sudo echo "//truenas.alle-schindlers.de/Daten /media/truenas cifs credentials=/home/simon/.smbcredentials,uid=simon,gid=simon,auto,rw 0 0" >> /etc/fstab
 fi
 
-mount /media/truenas
 
-echo "Login to Nextcloud in your browser."
-nextcloud
+if ! findmnt -rn --target /media/truenas &>/dev/null; then
+    echo "Mounting /media/truenas..."
+    sudo mount /media/truenas
+else
+    echo "/media/turnase is already mounted — skipping"
+fi
 
-# Wait for user to finish logging in
-read -p "Press enter when you have logged in to Nextcloud."
+if ! pacman -Qi nextcloud-client &>/dev/null; then
+    sudo pacman -S --needed --noconfirm your-package-name
+
+    echo "Login to Nextcloud in your browser."
+    nextcloud
+
+    # Wait for user to finish logging in
+    echo "Press enter when you have logged in to Nextcloud."
+    read
+
+else
+    echo "nextcloud-client was already installed — skipping setup"
+fi
+
+
+
