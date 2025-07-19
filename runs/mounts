@@ -34,7 +34,7 @@ if grep -q "//truenas.alle-schindlers.de/Daten" /etc/fstab; then
     echo "TrueNAS mount already exists in /etc/fstab, skipping."
 else
     echo "Adding TrueNAS mount to /etc/fstab."
-    sudo echo "//truenas.alle-schindlers.de/Daten /media/truenas cifs credentials=/home/simon/.smbcredentials,uid=simon,gid=simon,auto,rw 0 0" >> /etc/fstab
+    sudo echo "//truenas.alle-schindlers.de/Daten /media/truenas cifs credentials=/home/simon/.smbcredentials,uid=simon,gid=simon,auto,rw,x-systemd.automount 0 0" >> /etc/fstab
 fi
 
 
