@@ -42,11 +42,11 @@ if ! findmnt -rn --target /media/truenas &>/dev/null; then
     echo "Mounting /media/truenas..."
     sudo mount /media/truenas
 else
-    echo "/media/turnase is already mounted — skipping"
+    echo "/media/turnas is already mounted — skipping"
 fi
 
 if ! pacman -Qi nextcloud-client &>/dev/null; then
-    sudo pacman -S --needed --noconfirm your-package-name
+    sudo pacman -S --needed --noconfirm nextcloud-client
 
     echo "Login to Nextcloud in your browser."
     nextcloud
