@@ -1,5 +1,4 @@
 
-
 if test (pwd) == $HOME/personal
     clear
     return
