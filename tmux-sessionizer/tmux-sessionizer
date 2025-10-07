@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 switch_to() {
     if [[ -z $TMUX ]]; then
@@ -13,11 +13,14 @@ has_session() {
 }
 
 hydrate() {
-    if [ -f "$2/.tmux-sessionizer" ]; then
-        tmux send-keys -t "$1" "source $2/.tmux-sessionizer" c-M
-    elif [ -f $HOME/.config/tmux-sessionizer/.tmux-sessionizer ]; then
-        tmux send-keys -t "$1" "source $HOME/.config/tmux-sessionizer/.tmux-sessionizer" c-M
+    if [ -f "$2/.tmux-sessionizer.sh" ]; then
+        tmux send-keys -t "$1" "sh -c '$2/.tmux-sessionizer.sh'" c-M
+    elif [ -f "$HOME/.config/tmux-sessionizer/.tmux-sessionizer.sh" ]; then
+        tmux send-keys -t "$1" "sh -c '$HOME/.config/tmux-sessionizer/.tmux-sessionizer.sh'" c-M
+    else
+        echo "No .tmux-sessionizer.sh script found!"
     fi
+
 }
 
 if [[ $# -eq 1 ]]; then
