@@ -8,8 +8,7 @@
 
 
 tmux new-window -d -k -n 'dev' -t 2
-tmux new-window -d -k -n 'nvim' -t 1 nvim .
+tmux new-window -d -k -n 'nvim' -t 1 fish -c "nvim .; exec fish"
 
 tmux select-window -t 1
-
 
