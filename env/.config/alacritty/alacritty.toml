@@ -8,10 +8,10 @@ decorations = "full"
 title = "Alacritty@CachyOS"
 opacity = 1.0
 decorations_theme_variant = "Dark"
-# startup_mode = "Maximized"
+startup_mode = "Maximized"
 
 [window.dimensions]
-columns = 180
+columns = 100
 lines = 40
 
 [window.class]
