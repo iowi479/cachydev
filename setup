@@ -22,7 +22,7 @@ TARGET_DIR="$HOME/personal/cachydev"
 if [ ! -d $TARGET_DIR/.git ]; then
     # If not, create the directory and clone the repository
     mkdir $TARGET_DIR
-    git clone https://github.com/iowi479/cachydev $TARGET_DIR
+    git clone git@github.com:iowi479/cachydev $TARGET_DIR
 else
     # If it exists, pull the latest changes safely (fast-forward only)
     git -C $TARGET_DIR pull --ff-only
