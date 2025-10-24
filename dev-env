@@ -1,40 +1,75 @@
 #!/bin/sh
 
-dry_run="0"
+# Development environment setup script
+#
+# This script copies configuration files from the DEV_ENV_HOME to their respective locations.
 
-if [ -z "$DEV_ENV_HOME" ]; then
-    echo "env var DEV_ENV_HOME needs to be present"
-    exit 1
-fi
+# $1 --dry Optional to perform a dry run without making any changes.
+main() {
+    dry_run=0
 
-if [[ $1 == "--dry" ]]; then
-    dry_run="1"
-fi
+    if [ -z "$DEV_ENV_HOME" ]; then
+        log $dry_run "env var DEV_ENV_HOME needs to be present and point to the cachydev-repository"
+        exit 1
+    fi
 
+    if [[ $1 == "--dry" ]]; then
+        dry_run=1
+    fi
+
+
+    update_files $dry_run $DEV_ENV_HOME/env/.config $HOME/.config
+
+    if [ ! -d "$HOME/.local/bin" ]; then
+        mkdir -p "$HOME/.local/bin"
+        echo "Created $HOME/.local/bin"
+    fi
+
+    copy_file $dry_run $DEV_ENV_HOME/dev-env $HOME/.local/bin/dev-env
+    copy_file $dry_run $DEV_ENV_HOME/tmux-sessionizer/tmux-sessionizer $HOME/.local/bin/tmux-sessionizer
+}
+
+
+
+# Logs messages to the console, prepending [DRY_RUN] if in dry run mode
+# $1 dry_run
+# $2 message to log
 log() {
-    if [[ $dry_run == "1" ]]; then
-        echo "[DRY_RUN]: $1"
+    dry_run=$1
+    message=$2
+
+    if [[ $dry_run == 1 ]]; then
+        echo "[DRY_RUN]: $message"
     else
-        echo "$1"
+        echo "$message"
     fi
 }
 
+# Updates configuration files from source to destination directory
+# $1 dry_run
+# $2 source directory
+# $3 destination directory
 update_files() {
-    log "copying over files from: $1"
-    pushd $1 &> /dev/null
+    dry_run=$1
+    source_dir=$2
+    dest_dir=$3
+
+    log $dry_run "copying over files from: $source_dir"
+    pushd $source_dir &> /dev/null
     (
         configs=`find . -mindepth 1 -maxdepth 1 -type d`
         for c in $configs; do
-            directory=${2%/}/${c#./}
-            log "    removing: rm -rf $directory"
+            directory=${3%/}/${c#./}
+            log $dry_run "    removing: rm -rf $directory"
 
-            if [[ $dry_run == "0" ]]; then
-                rm -rf $directory
+            if [[ $dry_run == 0 ]]; then
+                # remove file if it exists
+                [ -e $to ] && rm -rf $directory
             fi
 
-            log "    copying env: cp $c $2"
-            if [[ $dry_run == "0" ]]; then
-                cp -r ./$c $2
+            log $dry_run "    copying env: cp $c $dest_dir"
+            if [[ $dry_run == 0 ]]; then
+                cp -r ./$c $dest_dir
             fi
         done
 
@@ -42,23 +77,24 @@ update_files() {
     popd &> /dev/null
 }
 
-copy() {
-    log "removing: $2"
-    if [[ $dry_run == "0" ]]; then
-        rm $2
+# Copies a file from $2 to $3
+# $1 dry_run flag
+# $2 source file
+# $3 destination file
+copy_file() {
+    dry_run=$1
+    from=$2
+    to=$3
+
+    log $dry_run "removing: $to"
+    if [[ $dry_run == 0 ]]; then
+        # remove file if it exists
+        [ -e $to ] && rm $to
     fi
-    log "copying: $1 to $2"
-    if [[ $dry_run == "0" ]]; then
-        cp $1 $2
+    log $dry_run "copying: $from to $to"
+    if [[ $dry_run == 0 ]]; then
+        cp $from $to
     fi
 }
 
-update_files $DEV_ENV_HOME/env/.config $HOME/.config
-
-if [ ! -d "$HOME/.local/bin" ]; then
-    mkdir -p "$HOME/.local/bin"
-    echo "Created $HOME/.local/bin"
-fi
-
-copy $DEV_ENV_HOME/dev-env $HOME/.local/bin/dev-env
-copy $DEV_ENV_HOME/tmux-sessionizer/tmux-sessionizer $HOME/.local/bin/tmux-sessionizer
+main "$@"
