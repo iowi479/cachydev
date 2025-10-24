@@ -1,7 +1,5 @@
 # CachyDev
 
-TODO: Update from Debian-based environment
-
 ## Setup
 Clone this repo or use the `setup` executable
 
@@ -36,11 +34,16 @@ sudo nano loader.conf
 And set `timeout 0` to hide the entry-selection unless you press a key on boot.
 
 ### Setup git
-```bash 
-git config --global credential.helper store
-git config --global user.email "<email>"
-git config --global user.name "<name>"
+```bash
+find ~ -maxdepth 1 -name .ssh | ls
 ```
+If there is already an ssh-key, add it to github.
+Otherwise generate one with:
+```bash
+ssh-keygen
+```
+
+Interact with git via ```git@github.com:<username>/repo.git```.
 
 ## Installing dependencies
 use the ```run``` script to install dependencies
