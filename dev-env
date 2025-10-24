@@ -1,6 +1,4 @@
-#!/bin/bash
-
-# TODO: Update
+#!/bin/sh
 
 dry_run="0"
 

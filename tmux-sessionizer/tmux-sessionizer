@@ -1,50 +1,65 @@
 #!/bin/sh
 
-switch_to() {
+# Tmux Sessionizer
+#
+# This script allows you to create or switch to tmux sessions based on directories.
+#
+# Each session is hydrated by running a .tmux-sessionizer.sh script.
+# This script can be placed in the target directory for specialized setups
+# Otherwise a global default script located at ~/.config/tmux-sessionizer/.tmux-sessionizer.sh is used.
+#
+# $1 Optional path to a directory; if not provided, fzf is used to select a directory
+main() {
+    # Check whether a path is provided as an argument; if not, use fzf to select a directory
+    if [[ $# -eq 1 ]]; then
+        full_path="$1"
+    else
+        full_path=$(find ~/personal ~/personal/cachydev/env/.config -mindepth 1 -maxdepth 1 -type d | fzf)
+    fi
+
+    # Exit if no directory was selected
+    if [[ -z "$full_path" ]]; then
+        exit 0
+    fi
+
+    # Generate a session name by taking the basename of the selected directory and replacing dots and spaces with underscores
+    session_name=$(basename "$full_path" | tr ' .-' '_')
+    tmux_running=$(pgrep tmux)
+
+    # Determine the hydration script for the selected directory
+    if [ -f "$full_path/.tmux-sessionizer.sh" ]; then
+        # There is a .tmux-sessionizer.sh script in the selected directory
+        hydration_script="$full_path/.tmux-sessionizer.sh"
+    else
+        hydration_script="$HOME/.config/tmux-sessionizer/.tmux-sessionizer.sh"
+    fi
+
+    # Create the tmux session if it doesn't already exist
+    if ! has_session "$session_name"; then
+        tmux new-session -d -s "$session_name" -c "$full_path" "$hydration_script"
+    fi
+
+    switch_to_session "$session_name"
+}
+
+# Switches to the specified tmux session, attaching if not already inside tmux
+# $1 session_name
+switch_to_session() {
     if [[ -z $TMUX ]]; then
+        # We are not currently inside a tmux session, so attach to the specified session
         tmux attach-session -t "$1"
     else
+        # We are already inside a tmux session, so switch to the specified session
         tmux switch-client -t "$1"
     fi
 }
 
+# Checks if a tmux session with the specified name exists
+# $1 session_name
 has_session() {
     tmux list-sessions | grep -q "^$1:"
 }
 
-hydrate() {
-    if [ -f "$2/.tmux-sessionizer.sh" ]; then
-        tmux send-keys -t "$1" "sh -c '$2/.tmux-sessionizer.sh'" c-M
-    elif [ -f "$HOME/.config/tmux-sessionizer/.tmux-sessionizer.sh" ]; then
-        tmux send-keys -t "$1" "sh -c '$HOME/.config/tmux-sessionizer/.tmux-sessionizer.sh'" c-M
-    else
-        echo "No .tmux-sessionizer.sh script found!"
-    fi
+# Call main
+main "$@"
 
-}
-
-if [[ $# -eq 1 ]]; then
-    selected="$1"
-else
-    selected=$(find ~/personal ~/personal/cachydev/env/.config -mindepth 1 -maxdepth 1 -type d | fzf)
-fi
-
-if [[ -z "$selected" ]]; then
-    exit 0
-fi
-
-selected_name=$(basename "$selected" | tr . _)
-tmux_running=$(pgrep tmux)
-
-if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
-    tmux new-session -s "$selected_name" -c "$selected"
-    hydrate "$selected_name" "$selected"
-    exit 0
-fi
-
-if ! has_session "$selected_name"; then
-    tmux new-session -ds "$selected_name" -c "$selected"
-    hydrate "$selected_name" "$selected"
-fi
-
-switch_to "$selected_name"
