@@ -11,8 +11,7 @@ Clone this repo or use the `setup` executable
 #### Disable `plymouth` animations for faster boot time.
 ```bash
 su
-cd /boot/loader/entries
-sudo nano linux-cachyos.conf
+sudo nano /boot/loader/entries/linux-cachyos.conf
 ```
 And remove `splash` from the options.
 
@@ -28,8 +27,7 @@ And remove `splash` from `LINUX_OPTIONS="zswap.enabled=0 nowatchdog quiet splash
 #### Disable entry selection to save 5 seconds on each boot.
 ```bash
 su
-cd /boot/loader
-sudo nano loader.conf
+sudo nano /boot/loader/loader.conf
 ```
 And set `timeout 0` to hide the entry-selection unless you press a key on boot.
 
@@ -48,7 +46,7 @@ Interact with git via ```git@github.com:<username>/repo.git```.
 ## Installing dependencies
 use the ```run``` script to install dependencies
 ```bash
-./run.sh
+./run
 ```
 
 ## Configuring the environment
