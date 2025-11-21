@@ -35,7 +35,8 @@ main() {
     fi
 
     # Create the tmux session if it doesn't already exist
-    if ! has_session "$session_name"; then
+    # Check if tmux is running and if the session already exists
+    if [[ -z $tmux_running || ! $(has_session "$session_name") ]]; then
         tmux new-session -d -s "$session_name" -c "$full_path" "$hydration_script"
     fi
 
