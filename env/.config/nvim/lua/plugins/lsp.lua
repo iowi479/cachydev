@@ -103,12 +103,36 @@ return {
                 }
             })
 
+
+            local nvim_lsp = require("lspconfig")
+
+
             -- LSP servers and clients are able to communicate to each other what features they support.
             --  By default, Neovim doesn't support everything that is in the LSP Specification.
             --  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
             --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
             local capabilities = vim.lsp.protocol.make_client_capabilities()
             capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
+
+
+            nvim_lsp.pyright.setup({
+                capabilities = capabilities,
+                on_new_config = function(new_config, root_dir)
+                    local pipfile_exists = require("lspconfig").util.search_ancestors(root_dir, function(path)
+                        local pipfile = require("lspconfig").util.path.join(path, "Pipfile")
+                        if require("lspconfig").util.path.is_file(pipfile) then
+                            return true
+                        else
+                            return false
+                        end
+                    end)
+
+                    if pipfile_exists then
+                        new_config.cmd = { "pipenv", "run", "pyright-langserver", "--stdio" }
+                    end
+                end,
+            })
+
 
             -- Enable the following language servers
             --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
