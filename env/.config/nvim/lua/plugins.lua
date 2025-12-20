@@ -1,16 +1,23 @@
 return {
-	-- "gc" to comment visual regions/lines
-	{ "numToStr/Comment.nvim", opts = {} },
 	{ -- Collection of various small independent plugins/modules
-		"echasnovski/mini.nvim",
+		"nvim-mini/mini.nvim",
+		version = false, -- use main branch
 		config = function()
 			-- Better Around/Inside textobjects
 			--
 			-- Examples:
 			--  - va)  - [V]isually select [A]round [)]paren
-			--  - yinq - [Y]ank [I]nside [N]ext [']quote
+			--  - yin' - [Y]ank [I]nside [N]ext [']quote
 			--  - ci'  - [C]hange [I]nside [']quote
-			require("mini.ai").setup({ n_lines = 500 })
+			require("mini.ai").setup({
+				n_lines = 500, -- increase how many lines to scan for textobject from default 50
+			})
+
+			-- Automatic commenting
+			--
+			-- "gc" to comment visual selection
+			-- "gcc" to comment current line
+			require("mini.comment").setup()
 
 			-- Add/delete/replace surroundings (brackets, quotes, etc.)
 			--
@@ -19,6 +26,8 @@ return {
 			-- - sr)'  - [S]urround [R]eplace [)] [']
 			require("mini.surround").setup()
 
+			require("mini.jump").setup()
+
 			local statusline = require("mini.statusline")
 			statusline.setup({
 				content = {
@@ -26,7 +35,6 @@ return {
 					inactive = nil,
 				},
 				use_icons = false,
-				set_vim_settings = true,
 			})
 
 			-- You can configure sections in the statusline by overriding their
@@ -37,6 +45,14 @@ return {
 				return ""
 			end
 		end,
+	},
+
+	-- Highlight todo, notes, etc in comments
+	{
+		"folke/todo-comments.nvim",
+		-- event = "VimEnter", -- TODO: I don't think this is still needed
+		dependencies = { "nvim-lua/plenary.nvim" },
+		opts = { signs = false },
 	},
 
 	{

@@ -1,18 +1,11 @@
 return {
 	{
 		"nvim-telescope/telescope.nvim",
-		event = "VimEnter",
-		branch = "0.1.x",
+		tag = "v0.2.0",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
-			{
-				"nvim-telescope/telescope-fzf-native.nvim",
-				build = "make",
-				cond = function()
-					return vim.fn.executable("make") == 1
-				end,
-			},
-			{ "nvim-telescope/telescope-ui-select.nvim" },
+			"nvim-telescope/telescope-fzf-native.nvim",
+			"nvim-telescope/telescope-ui-select.nvim",
 		},
 		config = function()
 			-- Two important keymaps to use while in telescope are:
@@ -21,7 +14,7 @@ return {
 			require("telescope").setup({
 				pickers = {
 					find_files = {
-						file_ignore_patterns = { "node_modules", ".git" },
+						file_ignore_patterns = { "node_modules/", ".git/" },
 						hidden = true,
 					},
 					live_grep = {
@@ -59,24 +52,6 @@ return {
 				local word = vim.fn.expand("<cWORD>")
 				builtin.grep_string({ search = word })
 			end)
-
-			-- Slightly advanced example of overriding default behavior and theme
-			vim.keymap.set("n", "<leader>/", function()
-				-- You can pass additional configuration to telescope to change theme, layout, etc.
-				builtin.current_buffer_fuzzy_find(require("telescope.themes").get_dropdown({
-					winblend = 10,
-					previewer = false,
-				}))
-			end, { desc = "[/] Fuzzily search in current buffer" })
-
-			-- Also possible to pass additional configuration options.
-			--  See `:help telescope.builtin.live_grep()` for information about particular keys
-			vim.keymap.set("n", "<leader>s/eovim", function()
-				builtin.live_grep({
-					grep_open_files = true,
-					prompt_title = "Live Grep in Open Files",
-				})
-			end, { desc = "[S]earch [/] in Open Files" })
 
 			-- Shortcut for searching your neovim configuration files
 			vim.keymap.set("n", "<leader>pc", function()

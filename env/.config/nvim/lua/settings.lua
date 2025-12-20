@@ -67,12 +67,11 @@ vim.opt.inccommand = "split"
 -- Show which line your cursor is on
 vim.opt.cursorline = true
 
--- format on save
+-- Format on save
 vim.api.nvim_create_autocmd({ "BufWritePre" }, {
 	pattern = "*",
 	callback = function(args)
 		require("conform").format({ bufnr = args.bufnr })
-		-- vim.lsp.buf.format()
 	end,
 })
 
