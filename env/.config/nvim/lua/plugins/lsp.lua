@@ -158,28 +158,25 @@ return {
 			--  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
 			local capabilities = require("blink.cmp").get_lsp_capabilities()
 
-			-- TODO: FIX this:
-
-			local nvim_lsp = require("lspconfig")
-
-			nvim_lsp.pyright.setup({
-				capabilities = capabilities,
-				on_new_config = function(new_config, root_dir)
-					local pipfile_exists = require("lspconfig").util.search_ancestors(root_dir, function(path)
-						local pipfile = require("lspconfig").util.path.join(path, "Pipfile")
-						if require("lspconfig").util.path.is_file(pipfile) then
-							return true
-						else
-							return false
-						end
-					end)
-
-					if pipfile_exists then
-						new_config.cmd = { "pipenv", "run", "pyright-langserver", "--stdio" }
-					end
-				end,
-			})
-
+			-- -- TODO: FIX this:
+			-- local nvim_lsp = require("lspconfig")
+			-- nvim_lsp.pyright.setup({
+			-- 	capabilities = capabilities,
+			-- 	on_new_config = function(new_config, root_dir)
+			-- 		local pipfile_exists = require("lspconfig").util.search_ancestors(root_dir, function(path)
+			-- 			local pipfile = require("lspconfig").util.path.join(path, "Pipfile")
+			-- 			if require("lspconfig").util.path.is_file(pipfile) then
+			-- 				return true
+			-- 			else
+			-- 				return false
+			-- 			end
+			-- 		end)
+			-- 		if pipfile_exists then
+			-- 			new_config.cmd = { "pipenv", "run", "pyright-langserver", "--stdio" }
+			-- 		end
+			-- 	end,
+			-- })
+			--
 			-- Enable the following language servers
 			--  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
 			--
@@ -193,8 +190,15 @@ return {
 				clangd = {
 					cmd = { "clangd", "--fallback-style=webkit" },
 				},
-				pyright = {},
-				rust_analyzer = {},
+				pyright = {
+					on_new_config = function(new_config, root_dir)
+						local pipfiles = vim.fs.find("Pipfile", { limit = 1, type = "file", path = root_dir })
+
+						if #pipfiles > 0 then
+							new_config.cmd = { "pipenv", "run", "pyright-langserver", "--stdio" }
+						end
+					end,
+				},
 				html = { filetypes = { "html", "twig", "hbs" } },
 				lua_ls = {
 					settings = {
@@ -235,7 +239,9 @@ return {
 						-- by the server configuration above. Useful when disabling
 						-- certain features of an LSP (for example, turning off formatting for tsserver)
 						server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
-						require("lspconfig")[server_name].setup(server)
+
+						vim.lsp.config(server_name, server)
+						vim.lsp.enable(server_name)
 					end,
 				},
 				ensure_installed = ensure_installed,
