@@ -4,32 +4,40 @@
 Clone this repo or use the `setup` executable
 
 ### Faster boot
-
 #### Disable CachyOS animation for faster boot time.
 `Settings > Colors & Themes > Splash Screen > None`
 
-#### Disable `plymouth` animations for faster boot time.
+
+#### Limine
+##### Disable `plymouth` animations for faster boot time.
+```bash
+su
+sudoedit /boot/limine.conf
+```
+And remove `splash` from the options.
+
+##### To permanently disable `splash`:
+```bash
+sudoedit /etc/default/limine
+```
+And remove `splash` from the arguments
+
+
+#### systemd-boot 
+##### Disable `plymouth` animations for faster boot time.
 ```bash
 su
 sudo nano /boot/loader/entries/linux-cachyos.conf
 ```
 And remove `splash` from the options.
 
-
-#### To permanently disable `splash`:
+##### To permanently disable `splash`:
 ```bash
 su
 sudo nano /etc/sdboot-manage.conf
 ```
 And remove `splash` from `LINUX_OPTIONS="zswap.enabled=0 nowatchdog quiet splash"`
 
-
-#### Disable entry selection to save 5 seconds on each boot.
-```bash
-su
-sudo nano /boot/loader/loader.conf
-```
-And set `timeout 0` to hide the entry-selection unless you press a key on boot.
 
 ### Setup git
 ```bash
