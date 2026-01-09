@@ -1,5 +1,5 @@
 #!/bin/bash
 
-sudo pacman -Syu --noconfirm --needed thunderbird tmux gparted sshfs solaar bitwarden virtualbox libreoffice-fresh discord
+sudo pacman -Syu --noconfirm --needed thunderbird tmux gparted sshfs solaar bitwarden virtualbox libreoffice-fresh discord python python-pipenv
 
 paru -Syu --noconfirm --needed spotify
