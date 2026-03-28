@@ -1,3 +1,7 @@
 #!/bin/bash
 
-sudo pacman -Syu --noconfirm --needed curl rust rust-analyzer
+sudo pacman -Syu --noconfirm --needed curl rustup
+
+rustup default stable
+rustup component add rust-src
+rustup component add rust-analyzer

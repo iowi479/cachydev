@@ -9,6 +9,11 @@ if not contains $HOME/.local/bin $PATH
     set -gx PATH $HOME/.local/bin $PATH
 end
 
+# Add ~/.cargo/bin/ to PATH if not already present
+if not contains $HOME/.cargo/bin $PATH
+    set -gx PATH $HOME/.cargo/bin $PATH
+end
+
 if not set -q DEV_ENV_HOME
     set -gx DEV_ENV_HOME "$HOME/personal/cachydev/"
 end
